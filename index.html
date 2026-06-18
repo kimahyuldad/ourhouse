@@ -255,7 +255,7 @@
                     <input type="number" id="input-cash" value="2.0" step="0.1" min="0" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm font-semibold p-2">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">기타 자산 (기존 부동산 등) (억원)</label>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">기타 자산 (억원)</label>
                     <input type="number" id="input-other" value="0.57" step="0.01" min="0" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm font-semibold p-2">
                 </div>
             </div>
@@ -427,6 +427,34 @@
                     <p class="font-label-caps text-outline mt-1">LTV 및 자산 연동 기준</p>
                 </div>
                 <div class="space-y-6 mb-8">
+                    <!-- Loan Product Selector -->
+                    <div>
+                        <label class="font-body-lg font-semibold text-on-surface block mb-2">적용 대출 상품</label>
+                        <div class="relative">
+                            <select id="loan-product-select" class="w-full rounded-lg border border-outline-variant/50 focus:border-primary focus:ring-primary text-sm p-3 bg-surface-container-low text-on-surface font-semibold appearance-none pr-10">
+                                <option value="bank" selected>🏦 시중은행 주택담보대출 (다주택자 가능)</option>
+                                <option value="bogum">🏠 보금자리론 (처분조건 1주택자 가능)</option>
+                                <option value="first_home">✨ 생애최초 주택자금대출 (무주택자용)</option>
+                                <option value="didimdol">🌾 디딤돌 구입자금 대출 (무주택자용)</option>
+                                <option value="newborn">🍼 신생아 특례 디딤돌대출 (출산가구용)</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                        </div>
+                        <div id="loan-product-desc-box" class="mt-3 p-4 bg-surface-container rounded-xl border border-outline-variant/30 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-primary" id="loan-eligibility-badge">주택 보유 수 제한 없음 (다주택자 가능)</span>
+                                <span class="text-on-surface-variant font-bold" id="loan-ltv-badge">최대 LTV 60%</span>
+                            </div>
+                            <p id="loan-product-desc" class="text-xs text-on-surface-variant leading-relaxed">
+                                일반 시중은행에서 제공하는 구입 자금 대출입니다. LTV 비율은 주택 보유 수와 지역 규제에 따라 30%~60%로 차등 적용됩니다.
+                            </p>
+                        </div>
+                        <!-- Warning message if requirements are not met -->
+                        <div id="loan-limit-warning" class="mt-3 p-3 bg-error-container/10 border border-error-container/30 text-error rounded-lg text-xs hidden flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">warning</span>
+                            <span id="loan-warning-text">선택한 상품의 LTV 대출 한도를 초과했습니다.</span>
+                        </div>
+                    </div>
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label class="font-body-lg font-semibold text-on-surface">대출 금리</label>
@@ -547,6 +575,14 @@
     const labelInterest = document.getElementById('label-interest');
     const labelRepayYears = document.getElementById('label-repay-years');
     const planMonthlyRepay = document.getElementById('plan-monthly-repay');
+
+    // Loan Product Selector variables
+    const loanProductSelect = document.getElementById('loan-product-select');
+    const loanProductDesc = document.getElementById('loan-product-desc');
+    const loanEligibilityBadge = document.getElementById('loan-eligibility-badge');
+    const loanLtvBadge = document.getElementById('loan-ltv-badge');
+    const loanLimitWarning = document.getElementById('loan-limit-warning');
+    const loanWarningText = document.getElementById('loan-warning-text');
 
     // Navigation Buttons
     const navDashboard = document.getElementById('nav-dashboard');
@@ -694,6 +730,59 @@
         updateReport(goalPrice, totalAssets, remaining, monthlySavingManwon, expectedYieldPercent, monthsNeeded);
     }
 
+    const loanProducts = {
+        bank: {
+            name: "시중은행 주택담보대출",
+            ltv: 0.6,
+            maxLimit: 20.0,
+            defaultInterest: 3.9,
+            minInterest: 3.0,
+            maxInterest: 6.5,
+            eligibility: "주택 보유 수 제한 없음 (다주택자 가능)",
+            desc: "일반 시중은행에서 제공하는 구입 자금 대출입니다. LTV 비율은 주택 보유 수와 지역 규제에 따라 30%~60%로 차등 적용됩니다."
+        },
+        bogum: {
+            name: "보금자리론",
+            ltv: 0.7,
+            maxLimit: 3.6,
+            defaultInterest: 4.2,
+            minInterest: 3.8,
+            maxInterest: 4.8,
+            eligibility: "무주택자 또는 기존주택 처분조건 1주택자",
+            desc: "고정금리로 최대 3억 6천만원까지 대출이 가능합니다. 1주택을 소유한 경우에도 일정 기간(3년) 내 처분 조건으로 대출 신청이 가능합니다."
+        },
+        first_home: {
+            name: "생애최초 주택자금대출",
+            ltv: 0.8,
+            maxLimit: 6.0,
+            defaultInterest: 3.2,
+            minInterest: 2.5,
+            maxInterest: 4.5,
+            eligibility: "무주택 세대주 중 생애최초 구입자",
+            desc: "생애 처음으로 주택을 구입하는 세대에게 LTV 최대 80%, 한도 6억원까지 저금리로 지원하는 정부 우대 상품입니다."
+        },
+        didimdol: {
+            name: "디딤돌 대출 (주택도시기금)",
+            ltv: 0.7,
+            maxLimit: 4.0,
+            defaultInterest: 2.7,
+            minInterest: 2.1,
+            maxInterest: 3.5,
+            eligibility: "부부합산 연소득 6천만원 이하 무주택 세대주",
+            desc: "주택 가격 5억원 이하 대상, 부부합산 소득 6천만원 이하 무주택 가구에 초저금리로 최대 2.5억(신혼 4억)까지 지원합니다."
+        },
+        newborn: {
+            name: "신생아 특례 디딤돌대출",
+            ltv: 0.8,
+            maxLimit: 5.0,
+            defaultInterest: 2.2,
+            minInterest: 1.6,
+            maxInterest: 3.3,
+            eligibility: "2년 이내 출산/입양한 무주택 가구 (소득 1.3억 이하)",
+            desc: "주택 가격 9억원 이하 대상, 신생아 출산/입양 가구에 연 1%~3%대 파격적인 금리로 최대 5억원까지 대출을 지원합니다."
+        }
+    };
+
     // Dynamically update the simulation analysis report
     function updateReport(goalPrice, totalAssets, remaining, monthlySavingManwon, expectedYieldPercent, monthsNeeded) {
         // 1. Saving boost: months saved by adding 50만원
@@ -715,11 +804,22 @@
             reportSavingBoostDesc.innerText = `이미 목표를 달성했습니다! 🎉`;
         }
 
-        // 2. Loan recommendation based on remaining
+        // 2. Loan recommendation based on selected product and remaining
         const reportLoanDesc = document.getElementById('report-loan-desc');
         if (remaining > 0) {
-            const ltv80 = (goalPrice * 0.8).toFixed(1);
-            reportLoanDesc.innerText = `생애최초 주택자금대출 활용 시 LTV 80% (최대 ${ltv80}억) 가능.`;
+            const prodKey = loanProductSelect ? loanProductSelect.value : 'bank';
+            const prod = loanProducts[prodKey] || loanProducts.bank;
+            const maxLtvAmount = (goalPrice * prod.ltv).toFixed(1);
+            let loanDescText = `${prod.name} 활용 시 LTV ${prod.ltv * 100}% (최대 ${maxLtvAmount}억) 가능.`;
+            
+            // Check limits and warnings
+            const currentLtv = remaining / goalPrice;
+            if (currentLtv > prod.ltv) {
+                loanDescText += ` ⚠️ 필요 LTV(${Math.round(currentLtv * 100)}%)가 상품 한도(${prod.ltv * 100}%)를 초과합니다.`;
+            } else if (remaining > prod.maxLimit) {
+                loanDescText += ` ⚠️ 필요 대출액(${remaining.toFixed(1)}억)이 상품 최대 한도(${prod.maxLimit.toFixed(1)}억)를 초과합니다.`;
+            }
+            reportLoanDesc.innerText = loanDescText;
         } else {
             reportLoanDesc.innerText = `대출 없이 목표 달성 가능합니다.`;
         }
@@ -749,6 +849,29 @@
 
         labelInterest.innerText = `${interestRateVal.toFixed(1)}%`;
         labelRepayYears.innerText = `${repayYearsVal}년`;
+
+        // Check warning limits in the Plan view
+        if (loanProductSelect) {
+            const prod = loanProducts[loanProductSelect.value];
+            if (prod && remaining > 0) {
+                const currentLtv = remaining / goalPrice;
+                let warningMsg = "";
+                if (currentLtv > prod.ltv) {
+                    warningMsg = `⚠️ 필요 LTV(${Math.round(currentLtv * 100)}%)가 선택한 상품의 LTV 한도(${prod.ltv * 100}%)를 초과합니다. 더 많은 보유 자산을 확보하거나 자금 계획 수정이 필요합니다.`;
+                } else if (remaining > prod.maxLimit) {
+                    warningMsg = `⚠️ 필요 대출액(${remaining.toFixed(2)}억)이 선택한 상품의 최대 대출 한도(${prod.maxLimit.toFixed(1)}억)를 초과합니다.`;
+                }
+
+                if (warningMsg) {
+                    loanLimitWarning.classList.remove('hidden');
+                    loanWarningText.innerText = warningMsg;
+                } else {
+                    loanLimitWarning.classList.add('hidden');
+                }
+            } else {
+                loanLimitWarning.classList.add('hidden');
+            }
+        }
 
         const loanAmount = remaining > 0 ? remaining : 1.0; // Default calculation baseline if no loan needed
 
@@ -817,6 +940,28 @@
     sliderYield.addEventListener('input', runSimulation);
     sliderInterest.addEventListener('input', calculateRepayment);
     sliderRepayYears.addEventListener('input', calculateRepayment);
+
+    // Loan Product selector listener
+    if (loanProductSelect) {
+        loanProductSelect.addEventListener('change', () => {
+            const prod = loanProducts[loanProductSelect.value];
+            if (!prod) return;
+            
+            // Set slider ranges and defaults
+            sliderInterest.min = prod.minInterest;
+            sliderInterest.max = prod.maxInterest;
+            sliderInterest.value = prod.defaultInterest;
+            labelInterest.innerText = `${prod.defaultInterest.toFixed(1)}%`;
+            
+            // Update info labels
+            loanEligibilityBadge.innerText = prod.eligibility;
+            loanLtvBadge.innerText = `최대 LTV ${prod.ltv * 100}%`;
+            loanProductDesc.innerText = prod.desc;
+            
+            calculateRepayment();
+            runSimulation();
+        });
+    }
 
     // Initial load updates
     updateAssets();
