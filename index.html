@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+    <title>AssetFlow - 아율이네 자산 관리</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-variant": "#e1e3e4",
+                "tertiary-container": "#006f4d",
+                "on-primary-container": "#d4dcff",
+                "on-error": "#ffffff",
+                "on-secondary-fixed-variant": "#3b4854",
+                "inverse-on-surface": "#f0f1f2",
+                "primary-fixed-dim": "#b5c4ff",
+                "inverse-primary": "#b5c4ff",
+                "tertiary": "#005439",
+                "on-tertiary-fixed-variant": "#005137",
+                "outline-variant": "#c3c5d7",
+                "tertiary-fixed-dim": "#7ad9ad",
+                "surface-tint": "#1353d8",
+                "surface": "#f8f9fa",
+                "surface-container-lowest": "#ffffff",
+                "surface-dim": "#d9dadb",
+                "background": "#f8f9fa",
+                "on-surface": "#191c1d",
+                "on-error-container": "#93000a",
+                "secondary-fixed": "#d6e4f3",
+                "error": "#ba1a1a",
+                "surface-container-highest": "#e1e3e4",
+                "surface-container-low": "#f3f4f5",
+                "error-container": "#ffdad6",
+                "on-surface-variant": "#434654",
+                "secondary-container": "#d6e4f3",
+                "on-secondary": "#ffffff",
+                "on-tertiary-container": "#90f0c2",
+                "tertiary-fixed": "#96f6c8",
+                "primary-container": "#1a56db",
+                "surface-container": "#edeeef",
+                "on-tertiary-fixed": "#002114",
+                "secondary": "#53606c",
+                "secondary-fixed-dim": "#bac8d6",
+                "primary-fixed": "#dbe1ff",
+                "on-secondary-container": "#586672",
+                "surface-container-high": "#e7e8e9",
+                "inverse-surface": "#2e3132",
+                "on-primary-fixed-variant": "#003dab",
+                "on-tertiary": "#ffffff",
+                "on-background": "#191c1d",
+                "on-primary-fixed": "#00174d",
+                "surface-bright": "#f8f9fa",
+                "on-primary": "#ffffff",
+                "primary": "#003fb1",
+                "on-secondary-fixed": "#001d31",
+                "outline": "#737686"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "stack-gap": "1rem",
+                "card-padding": "1.25rem",
+                "inline-gutter": "0.75rem",
+                "container-margin": "1rem",
+                "section-spacing": "2rem"
+            },
+            "fontFamily": {
+                "display-currency": ["Inter"],
+                "display-currency-mobile": ["Inter"],
+                "headline-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-md": ["Inter"],
+                "body-lg": ["Inter"],
+                "label-caps": ["Inter"]
+            },
+            "fontSize": {
+                "display-currency": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "display-currency-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background-color: #f8f9fa;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .circle-progress {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+        }
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #003fb1;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .slider-thumb::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #003fb1;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+
+<main class="max-w-2xl mx-auto px-4 pb-36 pt-6">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- 1. DASHBOARD VIEW -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="view-dashboard" class="space-y-4">
+        <!-- Welcome Message Section -->
+        <div class="mb-4">
+            <h1 class="font-headline-lg text-2xl text-on-surface font-bold">반가워요, 아율이네</h1>
+            <p class="font-body-md text-on-surface-variant mt-1">오늘의 자산 현황을 확인해보세요.</p>
+        </div>
+
+        <!-- Goal Achievement Card -->
+        <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30">
+            <h3 class="font-headline-md text-on-surface mb-6">내 집 마련 목표 달성률</h3>
+            
+            <!-- Gauge Chart -->
+            <div class="relative w-40 h-40 mx-auto flex items-center justify-center mb-6">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle class="text-secondary-container" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="transparent" />
+                    <circle class="text-primary circle-progress" id="gauge-circle" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="transparent"
+                            stroke-dasharray="251.3" stroke-dashoffset="145.7" stroke-linecap="round" />
+                </svg>
+                <div class="absolute text-center">
+                    <span class="block text-4xl font-extrabold text-primary" id="gauge-text">42%</span>
+                    <span class="text-xs text-on-surface-variant font-semibold">달성률</span>
+                </div>
+            </div>
+
+            <!-- Asset Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-semibold text-on-surface-variant">현재 자산</span>
+                    <span class="text-sm font-bold text-primary" id="progress-current-assets">3.57억원</span>
+                </div>
+                <div class="w-full bg-secondary-container h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-primary h-full transition-all duration-1000 ease-out" id="asset-progress-bar" style="width: 42%;"></div>
+                </div>
+            </div>
+
+            <!-- Goal Detail Boxes -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-surface-container-low p-4 rounded-xl">
+                    <span class="block text-xs text-on-surface-variant mb-1">목표 금액</span>
+                    <span class="text-lg font-bold text-on-surface" id="dash-goal-price">8.5억원</span>
+                </div>
+                <div class="bg-surface-container-low p-4 rounded-xl">
+                    <span class="block text-xs text-on-surface-variant mb-1">남은 금액</span>
+                    <span class="text-lg font-bold text-tertiary-container" id="dash-remaining-price">4.93억원</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Assets Status Card -->
+        <div class="bg-primary text-on-primary p-card-padding rounded-xl shadow-lg relative overflow-hidden group">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="font-label-caps uppercase tracking-wider opacity-80 text-xs">TOTAL ASSETS</span>
+                </div>
+                <h2 class="font-headline-md text-white mb-2">총 자산 현황</h2>
+                <div class="flex items-baseline gap-2 mb-4">
+                    <span class="text-3xl font-bold" id="total-assets-text">3억 5,700만원</span>
+                    <span class="bg-tertiary-container/90 text-white text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[10px] fill-current">trending_up</span>
+                        +2.4%
+                    </span>
+                </div>
+                <button class="w-full py-3 bg-white/10 hover:bg-white/20 active:scale-[0.98] transition-all text-white font-semibold rounded-lg text-center text-sm border border-white/10">
+                    리포트 보기
+                </button>
+            </div>
+        </div>
+
+        <!-- Action Buttons Group -->
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="switchTab('simulation'); focusInput('input-goal-price');" class="flex items-center justify-center gap-2 py-4 bg-white rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95 shadow-sm">
+                <span class="material-symbols-outlined text-primary text-xl">edit_square</span>
+                <span class="font-semibold text-on-surface text-sm">목표 수정</span>
+            </button>
+            <button onclick="switchTab('simulation'); focusInput('input-cash');" class="flex items-center justify-center gap-2 py-4 bg-white rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95 shadow-sm">
+                <span class="material-symbols-outlined text-primary text-xl">add_circle</span>
+                <span class="font-semibold text-on-surface text-sm">자산 추가</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- 2. SIMULATION VIEW -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="view-simulation" class="space-y-6 hidden">
+        <!-- Headline Section -->
+        <div>
+            <h1 class="font-headline-lg text-on-surface font-bold">내 집 마련 시뮬레이션</h1>
+            <p class="font-body-md text-on-surface-variant mt-2">꿈꾸던 보금자리, 시뮬레이션으로 한 걸음 더 가까이.</p>
+        </div>
+
+        <!-- Asset Inputs Section (Moved inside Simulation) -->
+        <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30">
+            <h3 class="font-headline-md text-on-surface mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">analytics</span>🎯 자산 정보 입력
+            </h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">목표 주택 가격 (억원)</label>
+                    <input type="number" id="input-goal-price" value="8.5" step="0.1" min="0" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm font-semibold p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">주식 자산 (억원)</label>
+                    <input type="number" id="input-stock" value="1.0" step="0.1" min="0" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm font-semibold p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">현재 현금성 자산 (억원)</label>
+                    <input type="number" id="input-cash" value="2.0" step="0.1" min="0" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm font-semibold p-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">기타 자산 (기존 부동산 등) (억원)</label>
+                    <input type="number" id="input-other" value="0.57" step="0.01" min="0" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm font-semibold p-2">
+                </div>
+            </div>
+            <button id="btn-calc-loan" class="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-container transition-all active:scale-[0.99] flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">payments</span>대출금 계산하기
+            </button>
+
+            <!-- Dynamic Calculation Results -->
+            <div id="calc-result-box" class="mt-4 hidden">
+                <!-- Will be dynamically populated via JS -->
+            </div>
+        </div>
+
+        <!-- Location Info Card (Naver Search Integration) -->
+        <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden border border-outline-variant/30">
+            <div class="flex flex-col gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">search</span>
+                    <span class="font-headline-md text-on-surface" id="sim-location-name">아파트 거래 금액 검색</span>
+                </div>
+                <!-- Search Input Block -->
+                <div class="flex gap-2">
+                    <div class="relative flex-grow">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+                        <input type="text" id="apt-search-input" placeholder="검색할 아파트 이름 입력 (예: 마포 래미안 푸르지오)" class="w-full rounded-lg border-outline-variant/50 focus:border-primary focus:ring-primary text-sm p-2 pl-9 bg-surface-container-low text-on-surface">
+                    </div>
+                    <button id="btn-naver-search" class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-container text-xs transition-all flex items-center justify-center gap-1 active:scale-95 whitespace-nowrap shadow-sm">
+                        <span class="material-symbols-outlined text-sm">open_in_new</span>네이버 검색
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Prediction Result Card -->
+        <div class="bg-primary-container text-on-primary-container p-card-padding rounded-xl shadow-lg relative overflow-hidden group">
+            <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">stars</span>
+                    <span class="font-label-caps opacity-90">GOAL PREDICTION</span>
+                </div>
+                <p class="font-headline-md leading-snug text-white" id="sim-prediction-text">
+                    현재 저축 속도라면 <span class="font-bold underline decoration-tertiary-fixed underline-offset-4" id="sim-prediction-date">2032년 8월</span>에 목표를 달성할 수 있어요
+                </p>
+                <div class="mt-6 w-full bg-on-primary-container/20 h-2 rounded-full overflow-hidden">
+                    <div class="bg-white h-full transition-all duration-1000 ease-out" id="sim-progress-bar" style="width: 45%;"></div>
+                </div>
+                <div class="flex justify-between mt-2 font-label-caps opacity-80">
+                    <span id="sim-current-assets-text">현재: 3.57억</span>
+                    <span id="sim-goal-price-text">목표: 8.5억</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Sliders -->
+        <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] space-y-8 border border-outline-variant/30">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <label class="font-headline-md text-on-surface" for="slider-saving">매월 저축액</label>
+                    <span class="text-primary font-headline-md" id="label-saving">350만원</span>
+                </div>
+                <input class="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer slider-thumb accent-primary transition-all" id="slider-saving" max="1000" min="50" type="range" value="350">
+                <div class="flex justify-between mt-2 font-label-caps text-on-surface-variant">
+                    <span>50만원</span>
+                    <span>1,000만원</span>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <label class="font-headline-md text-on-surface" for="slider-yield">기대 수익률</label>
+                    <span class="text-primary font-headline-md" id="label-yield">4.5%</span>
+                </div>
+                <input class="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer slider-thumb accent-primary transition-all" id="slider-yield" max="15.0" min="1.0" step="0.1" type="range" value="4.5">
+                <div class="flex justify-between mt-2 font-label-caps text-on-surface-variant">
+                    <span>1.0%</span>
+                    <span>15.0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Insights -->
+        <div class="bg-white p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30">
+            <h3 class="font-headline-md text-on-surface mb-4">시뮬레이션 분석 리포트</h3>
+            <ul class="space-y-4">
+                <li class="flex items-start gap-4 pb-4 border-b border-surface-container">
+                    <span class="material-symbols-outlined text-tertiary mt-1">trending_up</span>
+                    <div>
+                        <p class="font-body-lg font-semibold text-on-surface" id="report-saving-boost-title">저축액 50만원 증액 시</p>
+                        <p class="font-body-md text-on-surface-variant" id="report-saving-boost-desc">목표 달성 시기가 크게 단축됩니다.</p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-4 pb-4 border-b border-surface-container">
+                    <span class="material-symbols-outlined text-primary mt-1">account_balance</span>
+                    <div>
+                        <p class="font-body-lg font-semibold text-on-surface">추천 대출 상품</p>
+                        <p class="font-body-md text-on-surface-variant" id="report-loan-desc">생애최초 주택자금대출 활용 시 LTV 80% 가능.</p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-4">
+                    <span class="material-symbols-outlined text-secondary mt-1">info</span>
+                    <div>
+                        <p class="font-body-lg font-semibold text-on-surface">부대 비용 고려</p>
+                        <p class="font-body-md text-on-surface-variant" id="report-extra-cost-desc">취득세 및 복비 약 3,200만원 별도 필요.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- 3. PLAN VIEW -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="view-plan" class="space-y-6 hidden">
+        <!-- Headline Section -->
+        <div>
+            <h1 class="font-headline-lg text-on-surface mb-2 font-bold">목표 달성을 위한 플랜</h1>
+            <p class="font-body-lg text-on-surface-variant">자산 분석을 기반으로 최적화된 저축 및 상환 경로를 제안합니다.</p>
+        </div>
+
+        <!-- Recommendation Card -->
+        <section>
+            <div class="relative overflow-hidden rounded-xl bg-primary shadow-lg p-card-padding text-on-primary">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'wght' 700;">trending_up</span>
+                </div>
+                <div class="relative z-10">
+                    <p class="font-label-caps uppercase tracking-wider mb-2 opacity-90">MONTHLY RECOMMENDATION</p>
+                    <h2 class="font-display-currency text-display-currency-mobile mb-4" id="recommendation-title">매월 350만원 저축을 권장합니다</h2>
+                    <div class="flex items-center gap-2 bg-white/10 w-fit px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/20">
+                        <span class="material-symbols-outlined text-sm">info</span>
+                        <span class="font-body-md">현재 수입 대비 상위 15% 수준의 공격적 플랜</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Growth Projection & Coffee Desk Card -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- Chart Card -->
+            <div class="md:col-span-7 bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-headline-md text-on-surface mb-1">예상 자산 성장 곡선</h3>
+                    <p class="font-body-md text-on-surface-variant mb-6" id="projection-desc">플랜 유지 시 5년 후 약 2.4억 달성 가능</p>
+                </div>
+                <div class="h-32 w-full flex items-end gap-1.5 px-2">
+                    <div class="bg-primary-fixed-dim w-full h-[20%] rounded-t-sm"></div>
+                    <div class="bg-primary-fixed-dim w-full h-[35%] rounded-t-sm"></div>
+                    <div class="bg-primary-fixed-dim w-full h-[55%] rounded-t-sm"></div>
+                    <div class="bg-primary w-full h-[75%] rounded-t-sm"></div>
+                    <div class="bg-primary w-full h-[100%] rounded-t-sm shadow-[0_0_15px_rgba(0,63,177,0.3)]"></div>
+                </div>
+            </div>
+            <!-- Image Card -->
+            <div class="md:col-span-5 rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.05)] h-full min-h-[200px] relative">
+                <img class="absolute inset-0 w-full h-full object-cover" alt="Financial Growth Desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNQJK1V1RRks7U-FYejyq94-Rfw84uPLJcHcmlI-i4Bz0Lb6PlCpvFMcSR9JI7Wm1-K_e_1dYyZRhKZQhWbbUe4tvxqs5EpFZ9uli5G3iP-jd2FfAXyACnrE7ddCRDU-48eIfahtf9qUPZ5TrIJBQ0KQJru5C4e_FdeR7cMcBssE6Hw1PXcTVYh6KMmjY4RD15agYJlHMfH0xonZgPU2JorgaapS5ep_EHkZRPuKHyvaaBs2jeYIEwDH8b1s3Bl2Pbc-ldr12PrOs">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-card-padding">
+                    <p class="text-white font-body-md">안정적인 복리 효과를 위한<br>분산 투자가 시작됩니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loan Repayment Simulation Section -->
+        <section>
+            <h3 class="font-headline-md text-on-surface mb-4">대출 및 월 상환 상상 시뮬레이션</h3>
+            <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30">
+                <div class="mb-6">
+                    <p class="font-body-md text-on-surface-variant mb-1">내 집 마련을 위한 예상 대출액</p>
+                    <h4 class="font-headline-lg text-primary" id="plan-loan-amount-text">5.6억원 필요</h4>
+                    <p class="font-label-caps text-outline mt-1">LTV 및 자산 연동 기준</p>
+                </div>
+                <div class="space-y-6 mb-8">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="font-body-lg font-semibold text-on-surface">대출 금리</label>
+                            <span class="text-primary font-semibold" id="label-interest">3.8%</span>
+                        </div>
+                        <input class="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary" id="slider-interest" max="7.0" min="2.0" step="0.1" type="range" value="3.8">
+                        <div class="flex justify-between mt-2 font-label-caps text-on-surface-variant">
+                            <span>2.0%</span>
+                            <span>7.0%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="font-body-lg font-semibold text-on-surface">상환 기간</label>
+                            <span class="text-primary font-semibold" id="label-repay-years">30년</span>
+                        </div>
+                        <input class="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary" id="slider-repay-years" max="40" min="10" step="1" type="range" value="30">
+                        <div class="flex justify-between mt-2 font-label-caps text-on-surface-variant">
+                            <span>10년</span>
+                            <span>40년</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-primary-container/10 p-4 rounded-lg border border-primary/10 flex justify-between items-center">
+                    <span class="font-body-lg font-semibold text-on-surface">월 예상 상환액</span>
+                    <span class="font-headline-md text-primary" id="plan-monthly-repay">약 260만원</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommended Products -->
+        <section class="pb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-headline-md text-on-surface">추천 금융 상품</h3>
+                <span class="text-primary font-body-md font-semibold cursor-pointer">전체보기</span>
+            </div>
+            <div class="space-y-4">
+                <div onclick="openProductModal('housing')" class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant hover:border-primary transition-all group cursor-pointer shadow-sm">
+                    <div class="w-12 h-12 bg-secondary-container rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings:'FILL' 1;">home_work</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-body-lg font-semibold text-on-surface">주택청약종합저축</h4>
+                        <p class="font-body-md text-tertiary font-bold">최대 금리 4.5%</p>
+                    </div>
+                    <span class="material-symbols-outlined text-outline">chevron_right</span>
+                </div>
+                <div onclick="openProductModal('isa')" class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant hover:border-primary transition-all group cursor-pointer shadow-sm">
+                    <div class="w-12 h-12 bg-tertiary-fixed rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-on-tertiary-fixed" style="font-variation-settings:'FILL' 1;">savings</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-body-lg font-semibold text-on-surface">ISA 만기 연계 적금</h4>
+                        <p class="font-body-md text-on-surface-variant">비과세 혜택 및 높은 우대 금리</p>
+                    </div>
+                    <span class="material-symbols-outlined text-outline">chevron_right</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 py-3 pb-safe">
+    <!-- Tab 1: Dashboard -->
+    <button id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+        <span class="font-label-caps text-label-caps">대시보드</span>
+    </button>
+    <!-- Tab 2: Simulation -->
+    <button id="nav-simulation" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-xl active:scale-90 duration-200">
+        <span class="material-symbols-outlined">timeline</span>
+        <span class="font-label-caps text-label-caps">시뮬레이션</span>
+    </button>
+    <!-- Tab 3: Plan -->
+    <button id="nav-plan" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-xl active:scale-90 duration-200">
+        <span class="material-symbols-outlined">event_note</span>
+        <span class="font-label-caps text-label-caps">플랜</span>
+    </button>
+</nav>
+
+<!-- JavaScript Core Logic -->
+<script defer>
+    // Asset Inputs
+    const inputGoalPrice = document.getElementById('input-goal-price');
+    const inputStock = document.getElementById('input-stock');
+    const inputCash = document.getElementById('input-cash');
+    const inputOther = document.getElementById('input-other');
+    const btnCalcLoan = document.getElementById('btn-calc-loan');
+    const calcResultBox = document.getElementById('calc-result-box');
+
+    // Dashboard variables
+    const gaugeCircle = document.getElementById('gauge-circle');
+    const gaugeText = document.getElementById('gauge-text');
+    const progressCurrentAssets = document.getElementById('progress-current-assets');
+    const assetProgressBar = document.getElementById('asset-progress-bar');
+    const dashGoalPrice = document.getElementById('dash-goal-price');
+    const dashRemainingPrice = document.getElementById('dash-remaining-price');
+    const totalAssetsText = document.getElementById('total-assets-text');
+
+    // Simulation variables
+    const simPredictionText = document.getElementById('sim-prediction-text');
+    const simProgressBar = document.getElementById('sim-progress-bar');
+    const simCurrentAssetsText = document.getElementById('sim-current-assets-text');
+    const simGoalPriceText = document.getElementById('sim-goal-price-text');
+    const sliderSaving = document.getElementById('slider-saving');
+    const sliderYield = document.getElementById('slider-yield');
+    const labelSaving = document.getElementById('label-saving');
+    const labelYield = document.getElementById('label-yield');
+
+    // Plan variables
+    const recommendationTitle = document.getElementById('recommendation-title');
+    const projectionDesc = document.getElementById('projection-desc');
+    const planLoanAmountText = document.getElementById('plan-loan-amount-text');
+    const sliderInterest = document.getElementById('slider-interest');
+    const sliderRepayYears = document.getElementById('slider-repay-years');
+    const labelInterest = document.getElementById('label-interest');
+    const labelRepayYears = document.getElementById('label-repay-years');
+    const planMonthlyRepay = document.getElementById('plan-monthly-repay');
+
+    // Navigation Buttons
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navSimulation = document.getElementById('nav-simulation');
+    const navPlan = document.getElementById('nav-plan');
+
+    // Navigation Views
+    const viewDashboard = document.getElementById('view-dashboard');
+    const viewSimulation = document.getElementById('view-simulation');
+    const viewPlan = document.getElementById('view-plan');
+
+    // Tab switcher
+    function switchTab(target) {
+        // Reset navigation styles
+        [navDashboard, navSimulation, navPlan].forEach(btn => {
+            btn.className = "flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-xl active:scale-90 duration-200";
+            const icon = btn.querySelector('.material-symbols-outlined');
+            if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+        });
+        // Hide all views
+        [viewDashboard, viewSimulation, viewPlan].forEach(view => view.classList.add('hidden'));
+
+        if (target === 'dashboard') {
+            viewDashboard.classList.remove('hidden');
+            navDashboard.className = "flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200";
+            navDashboard.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+        } else if (target === 'simulation') {
+            viewSimulation.classList.remove('hidden');
+            navSimulation.className = "flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200";
+            navSimulation.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+        } else if (target === 'plan') {
+            viewPlan.classList.remove('hidden');
+            navPlan.className = "flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200";
+            navPlan.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+        }
+    }
+
+    navDashboard.addEventListener('click', () => switchTab('dashboard'));
+    navSimulation.addEventListener('click', () => switchTab('simulation'));
+    navPlan.addEventListener('click', () => switchTab('plan'));
+
+    // Focus Helper
+    window.focusInput = function(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            input.focus();
+        }
+    };
+
+    // Calculate Assets & Update UI
+    function updateAssets() {
+        const goalPrice = parseFloat(inputGoalPrice.value) || 0;
+        const stock = parseFloat(inputStock.value) || 0;
+        const cash = parseFloat(inputCash.value) || 0;
+        const other = parseFloat(inputOther.value) || 0;
+
+        const totalAssets = stock + cash + other;
+        const remaining = Math.max(goalPrice - totalAssets, 0);
+        const rate = goalPrice > 0 ? Math.min(Math.round((totalAssets / goalPrice) * 100), 100) : 0;
+
+        // Update Dashboard Elements
+        dashGoalPrice.innerText = `${goalPrice.toFixed(1)}억원`;
+        dashRemainingPrice.innerText = `${remaining.toFixed(2)}억원`;
+        progressCurrentAssets.innerText = `${totalAssets.toFixed(2)}억원`;
+        
+        // Split total assets into Eok and Manwon units
+        const eok = Math.floor(totalAssets);
+        const man = Math.round((totalAssets - eok) * 10000);
+        let assetStr = "";
+        if (eok > 0) assetStr += `${eok}억 `;
+        if (man > 0) assetStr += `${man.toLocaleString()}만원`;
+        if (eok === 0 && man === 0) assetStr = "0원";
+        totalAssetsText.innerText = assetStr.trim();
+
+        // Update Gauge Chart
+        gaugeText.innerText = `${rate}%`;
+        const offset = 251.3 * (1 - rate / 100);
+        gaugeCircle.setAttribute('stroke-dashoffset', offset);
+        assetProgressBar.style.width = `${rate}%`;
+
+        // Update Simulation Tab
+        simCurrentAssetsText.innerText = `현재: ${totalAssets.toFixed(2)}억`;
+        simGoalPriceText.innerText = `목표: ${goalPrice.toFixed(1)}억`;
+
+        // Update Plan Tab Title & Estimated Loan
+        planLoanAmountText.innerText = remaining > 0 ? `${remaining.toFixed(2)}억원 필요` : '대출이 필요 없습니다!';
+        
+        runSimulation();
+        calculateRepayment();
+    }
+
+    // Goal simulation calculations (Savings & Yield Compound Interest)
+    function calcMonthsNeeded(remaining, monthlySavingManwon, expectedYieldPercent) {
+        if (remaining <= 0) return 0;
+        const S = monthlySavingManwon * 10000;
+        const R = remaining * 100000000;
+        const i_monthly = (expectedYieldPercent / 100) / 12;
+        if (i_monthly > 0) {
+            const valueToLog = 1 + (R * i_monthly) / S;
+            if (valueToLog <= 0) return Infinity;
+            return Math.ceil(Math.log(valueToLog) / Math.log(1 + i_monthly));
+        } else {
+            return Math.ceil(R / S);
+        }
+    }
+
+    function runSimulation() {
+        const goalPrice = parseFloat(inputGoalPrice.value) || 0;
+        const stock = parseFloat(inputStock.value) || 0;
+        const cash = parseFloat(inputCash.value) || 0;
+        const other = parseFloat(inputOther.value) || 0;
+        const totalAssets = stock + cash + other;
+        const remaining = Math.max(goalPrice - totalAssets, 0);
+
+        const monthlySavingManwon = parseInt(sliderSaving.value);
+        const expectedYieldPercent = parseFloat(sliderYield.value);
+
+        labelSaving.innerText = `${monthlySavingManwon.toLocaleString()}만원`;
+        labelYield.innerText = `${expectedYieldPercent.toFixed(1)}%`;
+
+        if (remaining <= 0) {
+            simPredictionText.innerHTML = `현재 보유 자산만으로 <span class="font-bold text-white underline decoration-tertiary-fixed underline-offset-4">목표를 즉시 달성</span>할 수 있어요!`;
+            simProgressBar.style.width = '100%';
+            updateReport(goalPrice, totalAssets, remaining, monthlySavingManwon, expectedYieldPercent, 0);
+            return;
+        }
+
+        const monthsNeeded = calcMonthsNeeded(remaining, monthlySavingManwon, expectedYieldPercent);
+
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth() + 1 + monthsNeeded;
+        while (currentMonth > 12) { currentMonth -= 12; currentYear += 1; }
+
+        simPredictionText.innerHTML = `현재 저축 속도라면 <span class="font-bold text-white underline decoration-tertiary-fixed underline-offset-4">${currentYear}년 ${currentMonth}월</span>에 목표를 달성할 수 있어요`;
+
+        const rate = goalPrice > 0 ? Math.min(Math.round((totalAssets / goalPrice) * 100), 100) : 0;
+        simProgressBar.style.width = `${rate}%`;
+
+        // Recommendation card logic in plan tab
+        recommendationTitle.innerText = `매월 ${monthlySavingManwon.toLocaleString()}만원 저축을 권장합니다`;
+        projectionDesc.innerText = `플랜 유지 시 5년 후 약 ${(totalAssets + (monthlySavingManwon * 12 * 5 / 10000)).toFixed(1)}억 달성 가능`;
+
+        updateReport(goalPrice, totalAssets, remaining, monthlySavingManwon, expectedYieldPercent, monthsNeeded);
+    }
+
+    // Dynamically update the simulation analysis report
+    function updateReport(goalPrice, totalAssets, remaining, monthlySavingManwon, expectedYieldPercent, monthsNeeded) {
+        // 1. Saving boost: months saved by adding 50만원
+        const reportSavingBoostTitle = document.getElementById('report-saving-boost-title');
+        const reportSavingBoostDesc = document.getElementById('report-saving-boost-desc');
+        if (remaining > 0) {
+            const monthsWith50More = calcMonthsNeeded(remaining, monthlySavingManwon + 50, expectedYieldPercent);
+            const monthsSaved = Math.max(0, monthsNeeded - monthsWith50More);
+            const yearsSaved = Math.floor(monthsSaved / 12);
+            const remMonths = monthsSaved % 12;
+            let savedStr = '';
+            if (yearsSaved > 0) savedStr += `${yearsSaved}년 `;
+            if (remMonths > 0) savedStr += `${remMonths}개월`;
+            if (!savedStr) savedStr = '큰 변화 없음';
+            reportSavingBoostTitle.innerText = `저축액 50만원 증액 시`;
+            reportSavingBoostDesc.innerText = `목표 달성 시기가 약 ${savedStr} 단축됩니다.`;
+        } else {
+            reportSavingBoostTitle.innerText = `저축액 50만원 증액 시`;
+            reportSavingBoostDesc.innerText = `이미 목표를 달성했습니다! 🎉`;
+        }
+
+        // 2. Loan recommendation based on remaining
+        const reportLoanDesc = document.getElementById('report-loan-desc');
+        if (remaining > 0) {
+            const ltv80 = (goalPrice * 0.8).toFixed(1);
+            reportLoanDesc.innerText = `생애최초 주택자금대출 활용 시 LTV 80% (최대 ${ltv80}억) 가능.`;
+        } else {
+            reportLoanDesc.innerText = `대출 없이 목표 달성 가능합니다.`;
+        }
+
+        // 3. Extra costs: 취득세(1~3%) + 복비(0.4~0.9%) ≈ 3.5%
+        const reportExtraCostDesc = document.getElementById('report-extra-cost-desc');
+        const extraCostEok = goalPrice * 0.035;
+        const extraCostMan = Math.round(extraCostEok * 10000);
+        const eok = Math.floor(extraCostEok);
+        const man = Math.round((extraCostEok - eok) * 10000);
+        let costStr = eok > 0 ? `${eok}억 ` : '';
+        costStr += man > 0 ? `${man.toLocaleString()}만원` : '';
+        reportExtraCostDesc.innerText = `취득세 및 복비 약 ${costStr || Math.round(extraCostMan).toLocaleString() + '만원'} 별도 필요.`;
+    }
+
+    // Monthly Loan Repayment calculations (EMI)
+    function calculateRepayment() {
+        const goalPrice = parseFloat(inputGoalPrice.value) || 0;
+        const stock = parseFloat(inputStock.value) || 0;
+        const cash = parseFloat(inputCash.value) || 0;
+        const other = parseFloat(inputOther.value) || 0;
+        const totalAssets = stock + cash + other;
+        const remaining = Math.max(goalPrice - totalAssets, 0);
+
+        const interestRateVal = parseFloat(sliderInterest.value);
+        const repayYearsVal = parseInt(sliderRepayYears.value);
+
+        labelInterest.innerText = `${interestRateVal.toFixed(1)}%`;
+        labelRepayYears.innerText = `${repayYearsVal}년`;
+
+        const loanAmount = remaining > 0 ? remaining : 1.0; // Default calculation baseline if no loan needed
+
+        const P = loanAmount * 100000000;
+        const r_monthly = (interestRateVal / 100) / 12;
+        const n_payments = repayYearsVal * 12;
+
+        let monthlyRepayment = 0;
+        if (r_monthly > 0) {
+            monthlyRepayment = P * (r_monthly * Math.pow(1 + r_monthly, n_payments)) / (Math.pow(1 + r_monthly, n_payments) - 1);
+        } else {
+            monthlyRepayment = P / n_payments;
+        }
+
+        const monthlyRepaymentManwon = Math.round(monthlyRepayment / 10000);
+        if (remaining <= 0) {
+            planMonthlyRepay.innerText = "상환할 대출금이 없습니다";
+        } else {
+            planMonthlyRepay.innerText = `약 ${monthlyRepaymentManwon.toLocaleString()}만원`;
+        }
+    }
+
+    // [대출금 계산하기] Action Button Click handler
+    btnCalcLoan.addEventListener('click', () => {
+        const goalPrice = parseFloat(inputGoalPrice.value) || 0;
+        const stock = parseFloat(inputStock.value) || 0;
+        const cash = parseFloat(inputCash.value) || 0;
+        const other = parseFloat(inputOther.value) || 0;
+        const totalAssets = stock + cash + other;
+        const needed = goalPrice - totalAssets;
+
+        calcResultBox.classList.remove('hidden');
+
+        if (totalAssets >= goalPrice) {
+            calcResultBox.innerHTML = `
+                <div class="bg-tertiary-container/10 border border-tertiary-container/30 text-tertiary-container p-4 rounded-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined text-2xl">check_circle</span>
+                    <div>
+                        <p class="font-bold text-sm">대출이 필요 없습니다!</p>
+                        <p class="text-xs opacity-90">현재 자산 총합(${totalAssets.toFixed(2)}억)이 목표 주택 가격(${goalPrice.toFixed(1)}억)을 충족합니다.</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            calcResultBox.innerHTML = `
+                <div class="bg-error-container/10 border border-error-container/30 text-error p-4 rounded-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined text-2xl">warning</span>
+                    <div>
+                        <p class="font-bold text-sm">필요한 대출 금액: <span class="text-lg font-extrabold">${needed.toFixed(2)}억원</span></p>
+                        <p class="text-xs opacity-90">목표 주택 가격(${goalPrice.toFixed(1)}억) - 보유 자산(${totalAssets.toFixed(2)}억)</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        updateAssets();
+    });
+
+    // Inputs change listeners
+    [inputGoalPrice, inputStock, inputCash, inputOther].forEach(elem => {
+        elem.addEventListener('input', updateAssets);
+    });
+
+    // Sliders listeners
+    sliderSaving.addEventListener('input', runSimulation);
+    sliderYield.addEventListener('input', runSimulation);
+    sliderInterest.addEventListener('input', calculateRepayment);
+    sliderRepayYears.addEventListener('input', calculateRepayment);
+
+    // Initial load updates
+    updateAssets();
+
+    // Product data details
+    const productData = {
+        housing: {
+            title: "주택청약종합저축",
+            badge: "내집마련 필수",
+            icon: "home_work",
+            colorClass: "bg-secondary-container text-on-secondary-container",
+            intro: "정부 지원 주택구입 목적의 청약 자격을 얻기 위한 필수 저축 상품입니다.",
+            interest: "최대 연 4.5% (우대금리 적용 시)",
+            benefit: "연간 납입액(최대 300만원)의 40% 소득공제 (최대 120만원 혜택)",
+            desc: "청약 저축, 청약 예금, 청약 부금을 하나로 통합한 상품으로 국민주택과 민영주택 모두 청약할 수 있습니다.",
+            link: "https://nhuf.molit.go.kr/"
+        },
+        isa: {
+            title: "ISA 만기 연계 적금",
+            badge: "세제 혜택 극대화",
+            icon: "savings",
+            colorClass: "bg-tertiary-fixed text-on-tertiary-fixed",
+            intro: "개인자산관리계좌(ISA) 만기 자금을 적금으로 연계하여 추가 세제 혜택과 높은 우대 이율을 받는 상품입니다.",
+            interest: "기본 3.5% + 우대 최고 연 2.0%p",
+            benefit: "ISA 만기 자금 연금계좌 전환 시 전환금액의 10%(최대 300만원) 추가 세액공제",
+            desc: "목돈 마련과 함께 비과세 혜택을 동시에 누릴 수 있는 만능 통장입니다. 적립식 및 거치식 모두 가능합니다.",
+            link: "https://www.fss.or.kr"
+        }
+    };
+
+    window.openProductModal = function(type) {
+        const data = productData[type];
+        if (!data) return;
+
+        const contentArea = document.getElementById('modal-content-area');
+        const modal = document.getElementById('product-modal');
+        const actionLink = document.getElementById('modal-action-link');
+
+        contentArea.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 ${data.colorClass} rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">${data.icon}</span>
+                </div>
+                <div>
+                    <span class="inline-block text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-full mb-1">${data.badge}</span>
+                    <h3 class="font-headline-md text-on-surface">${data.title}</h3>
+                </div>
+            </div>
+            <p class="font-body-md text-on-surface font-semibold pt-2">${data.intro}</p>
+            <div class="bg-surface-container p-4 rounded-xl space-y-2 text-sm text-on-surface">
+                <div class="flex justify-between">
+                    <span class="text-on-surface-variant font-medium">적용 금리</span>
+                    <span class="font-bold text-primary">${data.interest}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-on-surface-variant font-medium">주요 혜택</span>
+                    <span class="font-bold text-tertiary-container text-right max-w-[180px]">${data.benefit}</span>
+                </div>
+            </div>
+            <p class="font-body-md text-on-surface-variant leading-relaxed text-xs">${data.desc}</p>
+        `;
+
+        actionLink.href = data.link;
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.querySelector('.transform').classList.remove('scale-95');
+            modal.querySelector('.transform').classList.add('scale-100');
+        }, 10);
+    };
+
+    window.closeProductModal = function() {
+        const modal = document.getElementById('product-modal');
+        modal.querySelector('.transform').classList.remove('scale-100');
+        modal.querySelector('.transform').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 150);
+    };
+
+    // Close modal on background click
+    const modalEl = document.getElementById('product-modal');
+    if (modalEl) {
+        modalEl.addEventListener('click', (e) => {
+            if (e.target.id === 'product-modal') closeProductModal();
+        });
+    }
+
+    // Naver Search Integration
+    const aptSearchInput = document.getElementById('apt-search-input');
+    const btnNaverSearch = document.getElementById('btn-naver-search');
+    const simLocationName = document.getElementById('sim-location-name');
+
+    // Sync input apartment name to location name card text
+    aptSearchInput.addEventListener('input', () => {
+        const val = aptSearchInput.value.trim();
+        simLocationName.innerText = val ? val : "아파트 거래 금액 검색";
+    });
+
+    // Perform Naver Search
+    function performNaverSearch() {
+        const query = aptSearchInput.value.trim();
+        if (!query) {
+            alert('검색할 아파트 이름을 입력해 주세요.');
+            aptSearchInput.focus();
+            return;
+        }
+        // Redirect to Naver search results for [Apartment Name] + "실거래가"
+        const searchUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(query + ' 실거래가')}`;
+        window.open(searchUrl, '_blank');
+    }
+
+    btnNaverSearch.addEventListener('click', performNaverSearch);
+
+    aptSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performNaverSearch();
+        }
+    });
+
+</script>
+
+<!-- Financial Product Details Modal -->
+<div id="product-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm hidden transition-all duration-300">
+    <div class="bg-white dark:bg-surface-dim rounded-2xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-300 relative border border-outline-variant/30">
+        <!-- Close Button -->
+        <button onclick="closeProductModal()" class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <!-- Modal Content -->
+        <div id="modal-content-area" class="space-y-4">
+            <!-- Dynamically populated -->
+        </div>
+        <!-- Modal Footer Action -->
+        <div class="mt-6 flex gap-3">
+            <button onclick="closeProductModal()" class="flex-1 py-3 bg-surface-container hover:bg-surface-container-high font-semibold rounded-lg text-center text-sm transition-all text-on-surface">닫기</button>
+            <a id="modal-action-link" href="#" target="_blank" class="flex-1 py-3 bg-primary text-white font-semibold rounded-lg text-center text-sm hover:bg-primary-container transition-all flex items-center justify-center gap-1">
+                자세히 보기 <span class="material-symbols-outlined text-sm">open_in_new</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
