@@ -135,6 +135,40 @@
             border: 4px solid #ffffff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #191c1d !important;
+            }
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            /* Hide UI components not useful on paper */
+            nav, 
+            #btn-save-plan,
+            #btn-report-modify,
+            button {
+                display: none !important;
+            }
+            #view-report {
+                display: block !important;
+            }
+            #view-dashboard,
+            #view-simulation,
+            #view-plan {
+                display: none !important;
+            }
+            .bg-surface-container-lowest,
+            .bg-white {
+                background-color: #ffffff !important;
+                border: 1px solid #edeeef !important;
+            }
+            .shadow-lg, .shadow-sm, .shadow-2xl, .shadow-\[0_4px_20px_rgba\(0\,0\,0\,0\.05\)\] {
+                box-shadow: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-surface text-on-surface">
@@ -514,6 +548,168 @@
                 </div>
             </div>
         </section>
+
+        <!-- Save Plan Action Button -->
+        <section class="pb-8">
+            <button id="btn-save-plan" class="w-full py-4 bg-tertiary-container hover:bg-tertiary text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-base">
+                <span class="material-symbols-outlined">save_alt</span>
+                이 자산 계획 저장 및 리포트 보기
+            </button>
+        </section>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- 4. REPORT VIEW -->
+    <!-- ═══════════════════════════════════════ -->
+    <div id="view-report" class="space-y-6 hidden">
+        <!-- Headline Section -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="font-headline-lg text-on-surface mb-2 font-bold">자산 계획 요약 리포트</h1>
+                <p class="font-body-lg text-on-surface-variant">저장된 최종 시뮬레이션 및 상환 로드맵 결과입니다.</p>
+            </div>
+            <!-- Dynamic Date Stamp -->
+            <span class="text-xs text-outline bg-surface-container-high px-2.5 py-1 rounded-full" id="report-timestamp">2026.06.19 저장됨</span>
+        </div>
+
+        <!-- Target Property Card -->
+        <div class="bg-gradient-to-br from-primary to-primary-container p-6 rounded-2xl text-on-primary shadow-lg relative overflow-hidden">
+            <div class="absolute right-0 bottom-0 opacity-10 translate-x-4 translate-y-4">
+                <span class="material-symbols-outlined text-[150px]">apartment</span>
+            </div>
+            <div class="relative z-10 space-y-4">
+                <span class="inline-block text-[10px] font-bold px-2.5 py-1 bg-white/20 text-white rounded-full uppercase tracking-wider">Target Property</span>
+                <div>
+                    <h2 class="text-2xl font-extrabold tracking-tight" id="report-target-apt-name">목표 주택 (검색된 아파트 없음)</h2>
+                    <p class="text-sm opacity-90 mt-1">목표 가격: <span class="font-bold text-white text-lg" id="report-target-price">8.5억</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overview Split Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Asset Status Card -->
+            <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 space-y-3">
+                <h3 class="font-body-lg font-semibold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">account_balance_wallet</span>보유 자산 요약
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between border-b border-surface-container pb-1.5">
+                        <span class="text-on-surface-variant">총 보유 자산</span>
+                        <span class="font-bold text-on-surface" id="report-total-assets">3.57억</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-on-surface-variant pl-2">
+                        <span>현금성 자산</span>
+                        <span id="report-cash">2.00억</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-on-surface-variant pl-2">
+                        <span>주식 자산</span>
+                        <span id="report-stock">1.00억</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-on-surface-variant pl-2">
+                        <span>기타 자산</span>
+                        <span id="report-other">0.57억</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loan & LTV Card -->
+            <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 space-y-3">
+                <h3 class="font-body-lg font-semibold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">calculate</span>대출 및 LTV 분석
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between border-b border-surface-container pb-1.5">
+                        <span class="text-on-surface-variant">필요 대출 금액</span>
+                        <span class="font-bold text-error" id="report-needed-loan">4.93억</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">필요 LTV 비율</span>
+                        <span class="font-bold text-on-surface" id="report-needed-ltv">58%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">적용 대출 상품</span>
+                        <span class="font-bold text-primary" id="report-selected-product">시중은행 주담대</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Repayment & Simulation Roadmap Detailed Card -->
+        <div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 space-y-6">
+            <h3 class="font-headline-md text-on-surface flex items-center gap-2 border-b border-surface-container pb-3">
+                <span class="material-symbols-outlined text-primary">timeline</span>상환 및 저축 로드맵
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Loan Repayment Details -->
+                <div class="space-y-4">
+                    <h4 class="font-body-lg font-semibold text-on-surface-variant">대출 상환 조건</h4>
+                    <div class="bg-surface-container-low p-4 rounded-xl space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-on-surface-variant">적용 금리</span>
+                            <span class="font-bold" id="report-interest-rate">3.8%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-on-surface-variant">상환 기간</span>
+                            <span class="font-bold" id="report-repay-years">30년</span>
+                        </div>
+                        <div class="flex justify-between pt-2 border-t border-outline-variant/20">
+                            <span class="font-semibold text-on-surface">월 예상 상환액</span>
+                            <span class="font-extrabold text-primary" id="report-monthly-repay">약 260만원</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-on-surface-variant">
+                            <span>연간 상환 원리금</span>
+                            <span id="report-yearly-repay">약 3,120만원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Goal Details -->
+                <div class="space-y-4">
+                    <h4 class="font-body-lg font-semibold text-on-surface-variant">자산 저축 로드맵</h4>
+                    <div class="bg-surface-container-low p-4 rounded-xl space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-on-surface-variant">매월 저축액</span>
+                            <span class="font-bold" id="report-saving-amount">350만원</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-on-surface-variant">연간 기대수익률</span>
+                            <span class="font-bold" id="report-expected-yield">4.5%</span>
+                        </div>
+                        <div class="flex justify-between pt-2 border-t border-outline-variant/20">
+                            <span class="font-semibold text-on-surface">목표 달성 예상일</span>
+                            <span class="font-extrabold text-tertiary-container" id="report-target-date">2032년 8월</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-on-surface-variant">
+                            <span>남은 대기 시간</span>
+                            <span id="report-remaining-time">6년 2개월</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Alert Card -->
+        <div class="p-4 rounded-xl flex items-start gap-3" id="report-diagnosis-card">
+            <span class="material-symbols-outlined text-2xl" id="report-diagnosis-icon">check_circle</span>
+            <div>
+                <h4 class="font-body-lg font-semibold" id="report-diagnosis-title">자산 플랜 진단: 적합</h4>
+                <p class="text-xs opacity-90 mt-0.5 leading-relaxed" id="report-diagnosis-desc">
+                    설정한 대출금 및 월 상환 계획이 자격 한도 내에 있습니다. 월 상환액과 저축 흐름을 꾸준히 이어나가세요.
+                </p>
+            </div>
+        </div>
+
+        <!-- Action Buttons inside Report -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-4 pb-8">
+            <button id="btn-report-modify" class="flex-grow py-3 bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">edit</span>플랜 다시 수정하기
+            </button>
+            <button onclick="window.print()" class="flex-grow py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-container transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-sm">print</span>리포트 인쇄 및 PDF 저장
+            </button>
+        </div>
     </div>
 
 </main>
@@ -534,6 +730,11 @@
     <button id="nav-plan" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-xl active:scale-90 duration-200">
         <span class="material-symbols-outlined">event_note</span>
         <span class="font-label-caps text-label-caps">플랜</span>
+    </button>
+    <!-- Tab 4: Report -->
+    <button id="nav-report" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-xl active:scale-90 duration-200">
+        <span class="material-symbols-outlined">summarize</span>
+        <span class="font-label-caps text-label-caps">리포트</span>
     </button>
 </nav>
 
@@ -588,22 +789,177 @@
     const navDashboard = document.getElementById('nav-dashboard');
     const navSimulation = document.getElementById('nav-simulation');
     const navPlan = document.getElementById('nav-plan');
+    const navReport = document.getElementById('nav-report');
 
     // Navigation Views
     const viewDashboard = document.getElementById('view-dashboard');
     const viewSimulation = document.getElementById('view-simulation');
     const viewPlan = document.getElementById('view-plan');
+    const viewReport = document.getElementById('view-report');
+
+    // Toast Alert Helper (Premium micro-animation popup)
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-inverse-surface text-inverse-on-surface px-6 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-semibold opacity-0 -translate-y-2 transition-all duration-300 pointer-events-none";
+        toast.innerHTML = `<span class="material-symbols-outlined text-tertiary-fixed-dim text-lg">check_circle</span> ${message}`;
+        document.body.appendChild(toast);
+        
+        // Force reflow
+        toast.offsetHeight;
+        
+        // Show
+        toast.classList.remove('opacity-0', '-translate-y-2');
+        toast.classList.add('opacity-100', 'translate-y-0');
+        
+        // Hide and remove after 2.5s
+        setTimeout(() => {
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', '-translate-y-2');
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
+
+    // Dynamic Report Render Logic
+    window.renderReport = function() {
+        const goalPrice = parseFloat(inputGoalPrice.value) || 0;
+        const stock = parseFloat(inputStock.value) || 0;
+        const cash = parseFloat(inputCash.value) || 0;
+        const other = parseFloat(inputOther.value) || 0;
+        const totalAssets = stock + cash + other;
+        const remaining = Math.max(0, goalPrice - totalAssets);
+        
+        // Search apartment name
+        const aptInput = document.getElementById('apt-search-input');
+        let aptName = aptInput ? aptInput.value.trim() : "";
+        if (!aptName) {
+            aptName = "아율이네 미래 보금자리";
+        }
+
+        // Selected loan product name
+        const prodKey = loanProductSelect ? loanProductSelect.value : 'bank';
+        const prod = loanProducts[prodKey] || loanProducts.bank;
+        const selectedProdName = prod.name;
+
+        // Interest, repayment years, monthly repayment
+        const interestRate = parseFloat(sliderInterest.value) || 3.8;
+        const repayYears = parseInt(sliderRepayYears.value) || 30;
+        
+        // Calculate monthly & yearly repayment
+        const loanAmount = remaining; // 억원
+        const P = loanAmount * 100000000;
+        const r_monthly = (interestRate / 100) / 12;
+        const n_payments = repayYears * 12;
+        let monthlyRepay = 0;
+        if (loanAmount > 0) {
+            if (r_monthly > 0) {
+                monthlyRepay = P * (r_monthly * Math.pow(1 + r_monthly, n_payments)) / (Math.pow(1 + r_monthly, n_payments) - 1);
+            } else {
+                monthlyRepay = P / n_payments;
+            }
+        }
+        const monthlyRepayManwon = Math.round(monthlyRepay / 10000);
+        const yearlyRepayManwon = Math.round(monthlyRepayManwon * 12);
+
+        // Savings & Yield simulation roadmap
+        const monthlySaving = parseInt(sliderSaving.value) || 350;
+        const expectedYield = parseFloat(sliderYield.value) || 4.5;
+        const monthsNeeded = calcMonthsNeeded(remaining, monthlySaving, expectedYield);
+
+        // Date calculation
+        const today = new Date();
+        const startYear = today.getFullYear();
+        const startMonth = today.getMonth() + 1; // 1-12
+        
+        let targetMonth = startMonth + (monthsNeeded % 12);
+        let targetYear = startYear + Math.floor(monthsNeeded / 12);
+        if (targetMonth > 12) {
+            targetMonth -= 12;
+            targetYear += 1;
+        }
+
+        // Remaining time text
+        let remainingTimeStr = "즉시 가능";
+        if (monthsNeeded > 0) {
+            const years = Math.floor(monthsNeeded / 12);
+            const months = monthsNeeded % 12;
+            remainingTimeStr = "";
+            if (years > 0) remainingTimeStr += `${years}년 `;
+            if (months > 0) remainingTimeStr += `${months}개월`;
+            remainingTimeStr += " 소요 예정";
+        }
+
+        // LTV ratio
+        const neededLtv = goalPrice > 0 ? Math.round((remaining / goalPrice) * 100) : 0;
+
+        // Populate elements
+        document.getElementById('report-timestamp').innerText = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')} 저장됨`;
+        document.getElementById('report-target-apt-name').innerText = aptName;
+        document.getElementById('report-target-price').innerText = `${goalPrice.toFixed(1)}억원`;
+        
+        document.getElementById('report-total-assets').innerText = `${totalAssets.toFixed(2)}억원`;
+        document.getElementById('report-cash').innerText = `${cash.toFixed(2)}억원`;
+        document.getElementById('report-stock').innerText = `${stock.toFixed(2)}억원`;
+        document.getElementById('report-other').innerText = `${other.toFixed(2)}억원`;
+
+        document.getElementById('report-needed-loan').innerText = remaining > 0 ? `${remaining.toFixed(2)}억원` : '대출 필요 없음';
+        document.getElementById('report-needed-ltv').innerText = remaining > 0 ? `${neededLtv}%` : '0%';
+        document.getElementById('report-selected-product').innerText = selectedProdName;
+
+        document.getElementById('report-interest-rate').innerText = `${interestRate.toFixed(1)}%`;
+        document.getElementById('report-repay-years').innerText = `${repayYears}년`;
+        document.getElementById('report-monthly-repay').innerText = remaining > 0 ? `약 ${monthlyRepayManwon.toLocaleString()}만원` : '0원';
+        document.getElementById('report-yearly-repay').innerText = remaining > 0 ? `약 ${yearlyRepayManwon.toLocaleString()}만원` : '0원';
+
+        document.getElementById('report-saving-amount').innerText = `${monthlySaving.toLocaleString()}만원`;
+        document.getElementById('report-expected-yield').innerText = `${expectedYield.toFixed(1)}%`;
+        document.getElementById('report-target-date').innerText = remaining > 0 ? `${targetYear}년 ${targetMonth}월` : '즉시 달성 완료';
+        document.getElementById('report-remaining-time').innerText = remainingTimeStr;
+
+        // Diagnosis logic
+        const diagnosisCard = document.getElementById('report-diagnosis-card');
+        const diagnosisIcon = document.getElementById('report-diagnosis-icon');
+        const diagnosisTitle = document.getElementById('report-diagnosis-title');
+        const diagnosisDesc = document.getElementById('report-diagnosis-desc');
+
+        const isLtvOver = remaining > 0 && (remaining / goalPrice) > prod.ltv;
+        const isLimitOver = remaining > 0 && remaining > prod.maxLimit;
+
+        if (isLtvOver || isLimitOver) {
+            // Error style
+            diagnosisCard.className = "p-4 rounded-xl flex items-start gap-3 bg-error-container/20 text-error border border-error/20";
+            diagnosisIcon.innerText = "warning";
+            diagnosisIcon.className = "material-symbols-outlined text-2xl text-error";
+            diagnosisTitle.innerText = "자산 플랜 진단: 조정 권장 (한도 초과)";
+            
+            let descText = "";
+            if (isLtvOver && isLimitOver) {
+                descText = `필요 LTV(${neededLtv}%)가 선택한 ${selectedProdName}의 한도(${prod.ltv*100}%)를 초과하고, 대출 금액(${remaining.toFixed(2)}억)도 최대 한도(${prod.maxLimit.toFixed(1)}억)를 초과합니다. 목표 주택 가격을 낮추거나 초기 자본을 늘려 계획을 재조정하세요.`;
+            } else if (isLtvOver) {
+                descText = `필요 LTV(${neededLtv}%)가 선택한 ${selectedProdName}의 한도(${prod.ltv*100}%)를 초과합니다. 저축액을 늘리거나 주택 목표 가격을 조정해야 합니다.`;
+            } else {
+                descText = `필요 대출 금액(${remaining.toFixed(2)}억)이 선택한 ${selectedProdName}의 최대 한도(${prod.maxLimit.toFixed(1)}억)를 초과합니다. 추가 자본 확보나 대출 상품 변경이 필요합니다.`;
+            }
+            diagnosisDesc.innerText = descText;
+        } else {
+            // Normal (Success) style
+            diagnosisCard.className = "p-4 rounded-xl flex items-start gap-3 bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20";
+            diagnosisIcon.innerText = "check_circle";
+            diagnosisIcon.className = "material-symbols-outlined text-2xl text-tertiary-container";
+            diagnosisTitle.innerText = "자산 플랜 진단: 적정 (안전)";
+            diagnosisDesc.innerText = `선택하신 ${selectedProdName}의 한도 및 LTV 기준을 충족합니다. 매월 계획된 ${monthlySaving}만원의 저축 및 연 ${expectedYield}%의 운용을 안정적으로 유지하신다면 ${targetYear}년 ${targetMonth}월에 성공적으로 내 집 마련이 가능합니다.`;
+        }
+    }
 
     // Tab switcher
     function switchTab(target) {
         // Reset navigation styles
-        [navDashboard, navSimulation, navPlan].forEach(btn => {
+        [navDashboard, navSimulation, navPlan, navReport].forEach(btn => {
             btn.className = "flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-xl active:scale-90 duration-200";
             const icon = btn.querySelector('.material-symbols-outlined');
             if (icon) icon.style.fontVariationSettings = "'FILL' 0";
         });
         // Hide all views
-        [viewDashboard, viewSimulation, viewPlan].forEach(view => view.classList.add('hidden'));
+        [viewDashboard, viewSimulation, viewPlan, viewReport].forEach(view => view.classList.add('hidden'));
 
         if (target === 'dashboard') {
             viewDashboard.classList.remove('hidden');
@@ -617,12 +973,54 @@
             viewPlan.classList.remove('hidden');
             navPlan.className = "flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200";
             navPlan.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+        } else if (target === 'report') {
+            renderReport();
+            viewReport.classList.remove('hidden');
+            navReport.className = "flex flex-col items-center justify-center gap-1 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200";
+            navReport.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
         }
     }
 
     navDashboard.addEventListener('click', () => switchTab('dashboard'));
     navSimulation.addEventListener('click', () => switchTab('simulation'));
     navPlan.addEventListener('click', () => switchTab('plan'));
+    navReport.addEventListener('click', () => switchTab('report'));
+
+    // Save button event listener
+    const btnSavePlan = document.getElementById('btn-save-plan');
+    if (btnSavePlan) {
+        btnSavePlan.addEventListener('click', () => {
+            // Save state (can be saved to localStorage if persistent storage is desired)
+            const planData = {
+                goalPrice: inputGoalPrice.value,
+                stock: inputStock.value,
+                cash: inputCash.value,
+                other: inputOther.value,
+                saving: sliderSaving.value,
+                yield: sliderYield.value,
+                interest: sliderInterest.value,
+                repayYears: sliderRepayYears.value,
+                product: loanProductSelect ? loanProductSelect.value : 'bank',
+                aptName: document.getElementById('apt-search-input') ? document.getElementById('apt-search-input').value : '',
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem('assetflow_saved_plan', JSON.stringify(planData));
+
+            // Show Toast & switch tab
+            showToast("자산 계획이 성공적으로 저장되었습니다!");
+            setTimeout(() => {
+                switchTab('report');
+            }, 600);
+        });
+    }
+
+    // Modify button inside report
+    const btnReportModify = document.getElementById('btn-report-modify');
+    if (btnReportModify) {
+        btnReportModify.addEventListener('click', () => {
+            switchTab('plan');
+        });
+    }
 
     // Focus Helper
     window.focusInput = function(id) {
